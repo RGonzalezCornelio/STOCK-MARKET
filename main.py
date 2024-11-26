@@ -17,6 +17,8 @@ def handler(signum, frame):
     print(Fore.RED + "❌")
     exit(1)
 
+init()
+signal.signal(signal.SIGINT, handler)
 
 work = openpyxl.load_workbook("./STOCK MARKET NAMES.xlsx")
 companies = work['NAMES']
