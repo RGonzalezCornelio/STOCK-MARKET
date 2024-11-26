@@ -27,7 +27,7 @@ y = int(open('./counter.txt').readline())
 linkstarter = "https://finance.yahoo.com/quote/"
 headers = {"User-Agent":"Mozilla/5.0"}
 
-for x in range(y, 30):
+for x in range(y, 5582):
 
     print(Fore.RESET + "processing "+ str(x) + "... ", end= '')
     jsonf = {} #Guardaremos la informacion en un json
@@ -47,6 +47,7 @@ for x in range(y, 30):
         try:
             respuesta = requests.get(link, headers=headers)
             if str(respuesta) != "<Response [200]>":
+                print("Error request")
                 print(Fore.RED + "❌")
                 continue
         except Exception:
@@ -57,12 +58,23 @@ for x in range(y, 30):
         data = BeautifulSoup(respuesta.text, 'html.parser')
 
         company = str(data.select('title')[0]).split(">")[1].split('(')[0]
+        #print(company)
+        #Esto se trata de un error en la web, supongo que sera por el gran numero de peticiones que se hacen a la pagina web. En todo caso haremos que el programa pare.
+        if company == "Symbol Lookup from Yahoo Finance</title":
+            
+            print("Error company name")
+            handler("", "")
+        
         jsonf["Company Name"] = company
-        print(company)
+        
 
-        stock_value = str(data.find('div', class_="container yf-1tejb6")).split('>')[3].split('<')[0]
+        try:
+            stock_value = str(data.find('div', class_="container yf-1tejb6")).split('>')[3].split('<')[0]
+        except Exception:
+            stock_value = 0
+
         jsonf["Stock Value"] = stock_value
-        print("Stock Value: " + stock_value)
+        print("Stock Value: " + str(stock_value))
 
         #statictics_table = str(data.find('table', class_="table yf-kbx2lo"))
         #statictics_table_values = str(data.find_all('td', class_="yf-kbx2lo"))
