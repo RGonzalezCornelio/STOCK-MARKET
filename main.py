@@ -27,80 +27,134 @@ y = int(open('./counter.txt').readline())
 linkstarter = "https://finance.yahoo.com/quote/"
 headers = {"User-Agent":"Mozilla/5.0"}
 
-for x in range(y, 10):
+for x in range(y, 30):
 
     print(Fore.RESET + "processing "+ str(x) + "... ", end= '')
     jsonf = {} #Guardaremos la informacion en un json
     cell = companies.cell(row=x, column=column)
-    company_name = str(companies.cell(row=x, column=1).value)
-    jsonf["Stock Name"] = company_name
+    stock_name = str(companies.cell(row=x, column=1).value)
 
-    link = linkstarter + company_name + "/key-statistics/"
-    jsonf["link"] = link
-    #print(company_name + ", " + link)
+    #Hay stock names que tienen '^' en el nombre, vamos a saltarlos porque son depositos y no interesan
+    if '^' not in stock_name:
 
-    try:
-        respuesta = requests.get(link, headers=headers)
-        if str(respuesta) != "<Response [200]>":
-            print(Fore.RED + "❌")
-            continue
-    except Exception:
-        handler("", "")
+        jsonf["Stock Name"] = stock_name
 
-    #respuesta = requests.get(link, headers=headers)
-    #Empezamos a coger datos de la pagina web
-    data = BeautifulSoup(respuesta.text, 'html.parser')
+        link = linkstarter + stock_name + "/key-statistics/"
+        jsonf["link"] = link
+        #print(company_name)
+        print(stock_name + ", " + link)
 
-    company = str(data.select('title')[0]).split(">")[1].split('(')[0]
-    jsonf["Company Name"] = company
-    print(company)
+        try:
+            respuesta = requests.get(link, headers=headers)
+            if str(respuesta) != "<Response [200]>":
+                print(Fore.RED + "❌")
+                continue
+        except Exception:
+            handler("", "")
 
-    stock_value = str(data.find('div', class_="container yf-1tejb6")).split('>')[3].split('<')[0]
-    jsonf["Stock Value"] = stock_value
-    print("Stock Value: " + stock_value)
+        
+        #Empezamos a coger datos de la pagina web
+        data = BeautifulSoup(respuesta.text, 'html.parser')
 
-    #statictics_table = str(data.find('table', class_="table yf-kbx2lo"))
-    #statictics_table_values = str(data.find_all('td', class_="yf-kbx2lo"))
-    #statictics_table_values = statictics_table.find('table', class_="table yf-kbx2lo")
-    #print(statictics_table_values)
+        company = str(data.select('title')[0]).split(">")[1].split('(')[0]
+        jsonf["Company Name"] = company
+        print(company)
 
-    market_cap = str(data.find_all('td', class_="yf-kbx2lo")[1]).split('>')[1].split('<')[0]
-    enterprise_value = str(data.find_all('td', class_="yf-kbx2lo")[8]).split('>')[1].split('<')[0]
-    trailing_PE = str(data.find_all('td', class_="yf-kbx2lo")[15]).split('>')[1].split('<')[0]
-    forward_PE = str(data.find_all('td', class_="yf-kbx2lo")[22]).split('>')[1].split('<')[0]
-    enterprise_value_EBITDA = str(data.find_all('td', class_="yf-kbx2lo")[57]).split('>')[1].split('<')[0]
-    #print("market_cap: " + market_cap + "Enterprise value: " + enterprise_value + "Trailing P/E: " + trailing_PE + "forward_PE: " + forward_PE + "enterprise_value_EBITDA: " + enterprise_value_EBITDA)
+        stock_value = str(data.find('div', class_="container yf-1tejb6")).split('>')[3].split('<')[0]
+        jsonf["Stock Value"] = stock_value
+        print("Stock Value: " + stock_value)
 
-    jsonf["Market Cap"] = market_cap
-    jsonf["Enterprise Value"] = enterprise_value
-    jsonf["Trailing P/E"] = trailing_PE
-    jsonf["Forward P/E"] = forward_PE
-    jsonf["Enterprise Value/EBITDA"] = enterprise_value_EBITDA
+        #statictics_table = str(data.find('table', class_="table yf-kbx2lo"))
+        #statictics_table_values = str(data.find_all('td', class_="yf-kbx2lo"))
+        #statictics_table_values = statictics_table.find('table', class_="table yf-kbx2lo")
+        #print(statictics_table_values)
+
+        try:
+            market_cap = str(data.find_all('td', class_="yf-kbx2lo")[1]).split('>')[1].split('<')[0]
+        except Exception:
+            market_cap = 0
+
+        try:
+            enterprise_value = str(data.find_all('td', class_="yf-kbx2lo")[8]).split('>')[1].split('<')[0]
+        except Exception:
+            enterprise_value = 0
+
+        try:
+            trailing_PE = str(data.find_all('td', class_="yf-kbx2lo")[15]).split('>')[1].split('<')[0]
+        except Exception:
+            trailing_PE = 0
+        try:
+            forward_PE = str(data.find_all('td', class_="yf-kbx2lo")[22]).split('>')[1].split('<')[0]
+        except Exception:
+            forward_PE = 0
+
+        try:
+            enterprise_value_EBITDA = str(data.find_all('td', class_="yf-kbx2lo")[57]).split('>')[1].split('<')[0]
+        except Exception:
+            enterprise_value_EBITDA = 0
+        #print("market_cap: " + market_cap + "Enterprise value: " + enterprise_value + "Trailing P/E: " + trailing_PE + "forward_PE: " + forward_PE + "enterprise_value_EBITDA: " + enterprise_value_EBITDA)
+
+        jsonf["Market Cap"] = market_cap
+        jsonf["Enterprise Value"] = enterprise_value
+        jsonf["Trailing P/E"] = trailing_PE
+        jsonf["Forward P/E"] = forward_PE
+        jsonf["Enterprise Value/EBITDA"] = enterprise_value_EBITDA
 
 
-    profit_margin = str(data.find_all('td', class_="value yf-vaowmx")[2]).split('>')[1].split('<')[0]
-    operating_margin = str(data.find_all('td', class_="value yf-vaowmx")[3]).split('>')[1].split('<')[0]
-    quarterly_revenue_growth = str(data.find_all('td', class_="value yf-vaowmx")[8]).split('>')[1].split('<')[0]
-    quarterly_earnings_growth = str(data.find_all('td', class_="value yf-vaowmx")[13]).split('>')[1].split('<')[0]
-    beta = str(data.find_all('td', class_="value yf-vaowmx")[22]).split('>')[1].split('<')[0]
-    percentage_by_insiders = str(data.find_all('td', class_="value yf-vaowmx")[34]).split('>')[1].split('<')[0]
-    forward_annual_divident_rate = str(data.find_all('td', class_="value yf-vaowmx")[41]).split('>')[1].split('<')[0]
-    five_year_divident_rate = str(data.find_all('td', class_="value yf-vaowmx")[45]).split('>')[1].split('<')[0]
-    #print("profit_margin: " + profit_margin + " operating_margin: " + operating_margin + " quarterly_revenue_growth: " + quarterly_revenue_growth + " quarterly_earnings_growth: " + quarterly_earnings_growth\
-    #       + " beta: " + beta + " percentage_by_insiders: " + percentage_by_insiders + " forward_annual_divident_rate" + forward_annual_divident_rate + " five_year_divident_rate: " + five_year_divident_rate)
+        try:
+            profit_margin = str(data.find_all('td', class_="value yf-vaowmx")[2]).split('>')[1].split('<')[0]
+        except Exception: 
+            profit_margin = 0
 
-    jsonf["Profit Margin"] = profit_margin
-    jsonf["Operating Margin"] = operating_margin
-    jsonf["Quarterly Revenue Growth"] = quarterly_revenue_growth
-    jsonf["Quarterly Earnings Growth"] = quarterly_earnings_growth
-    jsonf["Beta (5Y Monthly)"] = beta
-    jsonf["Percentage by insiders"] = percentage_by_insiders
-    jsonf["Forward Annual Dividend Rate"] = forward_annual_divident_rate
-    jsonf["5 Year Average Dividend Yield"] = five_year_divident_rate
-    
+        try:
+            operating_margin = str(data.find_all('td', class_="value yf-vaowmx")[3]).split('>')[1].split('<')[0]
+        except Exception: 
+            operating_margin = 0
 
-    jsonfile = open('./DataJSON/' + str(x) + '.json', 'w')
-    json.dump(jsonf, jsonfile)
-    print(Fore.GREEN + "✓")
+        try:
+            quarterly_revenue_growth = str(data.find_all('td', class_="value yf-vaowmx")[8]).split('>')[1].split('<')[0]
+        except Exception: 
+            quarterly_revenue_growth = 0
+        
+        try:
+            quarterly_earnings_growth = str(data.find_all('td', class_="value yf-vaowmx")[13]).split('>')[1].split('<')[0]
+        except Exception: 
+            quarterly_earnings_growth = 0
+
+        try:
+            beta = str(data.find_all('td', class_="value yf-vaowmx")[22]).split('>')[1].split('<')[0]
+        except Exception: 
+            beta = 0
+
+        try:
+            percentage_by_insiders = str(data.find_all('td', class_="value yf-vaowmx")[34]).split('>')[1].split('<')[0]
+        except Exception: 
+            percentage_by_insiders = 0
+
+        try:
+            forward_annual_divident_rate = str(data.find_all('td', class_="value yf-vaowmx")[41]).split('>')[1].split('<')[0]
+        except Exception: 
+            forward_annual_divident_rate = 0
+
+        try:
+            five_year_divident_rate = str(data.find_all('td', class_="value yf-vaowmx")[45]).split('>')[1].split('<')[0]
+        except Exception: 
+            five_year_divident_rate = 0
+        #print("profit_margin: " + profit_margin + " operating_margin: " + operating_margin + " quarterly_revenue_growth: " + quarterly_revenue_growth + " quarterly_earnings_growth: " + quarterly_earnings_growth\
+        #       + " beta: " + beta + " percentage_by_insiders: " + percentage_by_insiders + " forward_annual_divident_rate" + forward_annual_divident_rate + " five_year_divident_rate: " + five_year_divident_rate)
+
+        jsonf["Profit Margin"] = profit_margin
+        jsonf["Operating Margin"] = operating_margin
+        jsonf["Quarterly Revenue Growth"] = quarterly_revenue_growth
+        jsonf["Quarterly Earnings Growth"] = quarterly_earnings_growth
+        jsonf["Beta (5Y Monthly)"] = beta
+        jsonf["Percentage by insiders"] = percentage_by_insiders
+        jsonf["Forward Annual Dividend Rate"] = forward_annual_divident_rate
+        jsonf["5 Year Average Dividend Yield"] = five_year_divident_rate
+        
+
+        jsonfile = open('./DataJSON/' + str(x) + "_" + stock_name + '.json', 'w')
+        json.dump(jsonf, jsonfile)
+        print(Fore.GREEN + "✓")
 
 work.save("./STOCK MARKET NAMES.xlsx")
