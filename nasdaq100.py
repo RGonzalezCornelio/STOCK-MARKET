@@ -20,17 +20,16 @@ init()
 signal.signal(signal.SIGINT, handler)
 
 tickers = [
-    "AAPL", "MSFT", "AMZN", "NVDA", "TSLA", "META", "GOOG", "GOOGL", "PEP", "COST",
-    "AVGO", "ADBE", "NFLX", "AMD", "QCOM", "TXN", "INTC", "CSCO", "TMUS", "AMAT",
-    "INTU", "CMCSA", "HON", "ADP", "PYPL", "PDD", "ISRG", "MRVL", "MDLZ", "LRCX",
-    "REGN", "BKNG", "VRTX", "GILD", "SBUX", "MU", "FISV", "BIIB", "AIY.DE", "ZS",
-    "DXCM", "ASML", "ADSK", "SNPS", "MCHP", "KLAC", "ORLY", "FTNT", "CRWD", "PANW",
-    "MNST", "EXC", "ROST", "IDXX", "CDNS", "CSX", "LCID", "ABNB", "CTAS", "CHTR",
-    "PAYC", "WBD", "DOCU", "EBAY", "KDP", "EA", "TEAM", "SGEN", "DDOG", "ALGN",
-    "MTCH", "MAR", "OKTA", "CPRT", "PDD", "WDAY", "DDOG", "FSLR", "CEG", "SPLK",
-    "ZM", "CRWD", "PTON", "TTWO", "DOCU", "BIDU", "BIIB", "MRNA", "ZS", "LULU",
-    "NXPI", "ANSS", "CFLT", "VRSK", "RIVN", "OKTA", "SWKS", "SIRI", "LCID", "IQV",
-    "FLEX", "DLTR", "DXCM", "FAST", "ODFL"
+    'AAPL', 'MSFT', 'AMZN', 'NVDA', 'TSLA', 'META', 'GOOG', 'GOOGL', 'PEP', 'COST',
+    'AVGO', 'ADBE', 'NFLX', 'AMD', 'QCOM', 'TXN', 'INTC', 'CSCO', 'TMUS', 'AMAT',
+    'INTU', 'CMCSA', 'HON', 'ADP', 'PYPL', 'PDD', 'ISRG', 'MRVL', 'MDLZ', 'LRCX',
+    'REGN', 'BKNG', 'VRTX', 'GILD', 'SBUX', 'MU', 'FISV', 'BIIB', 'AIY.DE', 'ZS',
+    'DXCM', 'ASML', 'ADSK', 'SNPS', 'MCHP', 'KLAC', 'ORLY', 'FTNT', 'CRWD', 'PANW',
+    'MNST', 'EXC', 'ROST', 'IDXX', 'CDNS', 'CSX', 'LCID', 'ABNB', 'CTAS', 'CHTR',
+    'PAYC', 'WBD', 'DOCU', 'EBAY', 'KDP', 'EA', 'TEAM', 'SGENX', 'DDOG', 'ALGN',
+    'MTCH', 'MAR', 'OKTA', 'CPRT', 'WDAY', 'FSLR', 'CEG', 'SPLK', 'ZM', 'PTON',
+    'TTWO', 'BIDU', 'MRNA', 'LULU', 'NXPI', 'ANSS', 'CFLT', 'VRSK', 'RIVN', 'SWKS',
+    'SIRI', 'IQV', 'FLEX', 'DLTR', 'FAST', 'ODFL', 'BABA', 'DIS', 'XOM'
 ]
 
 
@@ -172,7 +171,7 @@ for x in range(y, len(tickers)):
     jsonf["5 Year Average Dividend Yield"] = five_year_divident_rate
     
 
-    jsonfile = open('./DataNasdaq100JSON/' + x + "_" + tickers[x] + '.json', 'w')
+    jsonfile = open('./DataNasdaq100JSON/' + str(x) + "_" + tickers[x] + '.json', 'w')
     json.dump(jsonf, jsonfile)
     print(Fore.GREEN + "✓")
 
